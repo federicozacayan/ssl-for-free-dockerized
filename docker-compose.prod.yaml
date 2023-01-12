@@ -31,11 +31,18 @@ services:
     environment:
       - VIRTUAL_HOST=www.samutips.com,samutips.com
       - LETSENCRYPT_HOST=www.samutips.com,samutips.com
-    volumes:
-      - ./client:/usr/share/nginx/html:ro
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    expose:
+      - 80
+    # volumes:
+    #   - ./client:/usr/share/nginx/html:ro
     depends_on:
       - nginx-proxy-acme
       - nginx-proxy
+      - api
+      - client
 
 
 volumes: 

@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+#PROXI
+  your-proxyed-app:
+    image: nginx
+    restart: always
+    ports:
+      - 80:80
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    depends_on:
+      - api
+      - client
+
+#BACK-END APP
+  api:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+    environment:
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+    depends_on:
+      - postgres
+#DATABASE
+  postgres:
+    image: "postgres:latest"
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+
+#FRONT-END APP
+  client:
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      dockerfile: Dockerfile.dev # .dev => with nodemon
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app

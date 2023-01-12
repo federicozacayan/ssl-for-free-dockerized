@@ -1,0 +1,23 @@
+###
+GET http://localhost/
+
+
+###
+POST http://localhost/api/values
+content-type: application/json
+
+{
+    "value": 1
+}
+
+###
+POST http://localhost/api/values
+content-type: application/json
+
+{
+    "value": 2
+}
+
+
+###
+GET http://localhost/api/values/all

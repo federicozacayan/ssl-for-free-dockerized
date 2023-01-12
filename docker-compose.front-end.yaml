@@ -1,0 +1,13 @@
+version: "3"
+services:
+#FRONT-END APP
+  client:
+    stdin_open: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    build:
+      dockerfile: Dockerfile # Dockerfile.dev => with nodemon
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
