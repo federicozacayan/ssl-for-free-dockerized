@@ -2,47 +2,44 @@ version: '3'
 
 services:
   nginx-proxy:
-    image:  nginxproxy/nginx-proxy
-    restart: always
+    image: nginxproxy/nginx-proxy
     ports:
-      - "80:80"
-      - "443:443"
+      - 80:80
+      - 443:443
     volumes:
-      - certs:/etc/nginx/certs 
-      - vhost:/etc/nginx/vhost.d 
-      - html:/usr/share/nginx/html 
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    labels:
-      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+
 
   nginx-proxy-acme:
     image: nginxproxy/acme-companion
-    restart: always
-    environment:
-      - DEFAULT_EMAIL=ssl@samutips.com
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - acme:/etc/acme.sh
+    volumes_from:
+      - nginx-proxy:rw
+    environment:
+      - DEFAULT_EMAIL=ssl@samutips.com
     depends_on:
       - nginx-proxy
-    volumes_from:
-    - nginx-proxy:rw
-    
 
-  www:
+
+  your-proxyed-app:
     image: nginx
-    restart: always
-    expose:
-      - "80"
+    environment:
+      - VIRTUAL_HOST=www.samutips.com,samutips.com
+      - LETSENCRYPT_HOST=www.samutips.com,samutips.com
     volumes:
       - ./client:/usr/share/nginx/html:ro
-    env_file:
-      - config/.env
     depends_on:
       - nginx-proxy-acme
       - nginx-proxy
+
+
 volumes: 
   certs:
-  html:
   vhost:
+  html:
   acme:
